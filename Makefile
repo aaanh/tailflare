@@ -8,14 +8,14 @@ GOGET=$(GOCMD) get
 # Name of the executable
 BINARY_NAME=tailflare
 
-all: test build
+all: cd test build
 
 build:
-	$(GOBUILD) -o build/$(BINARY_NAME) -v
+	cd src && $(GOBUILD) -o ../build/$(BINARY_NAME) -v
 
 test:
-	$(GOTEST) -v ./...
+	cd src $(GOTEST) -v ./...
 
-clean:
-	$(GOCLEAN)
+clean: cd
+	cd src && $(GOCLEAN)
 	rm -f $(BINARY_NAME)
