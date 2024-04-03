@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/gofor-little/env"
 )
 
 type Device struct {
@@ -25,7 +23,7 @@ type Endpoints struct {
 
 func generateEndpoints(tailnetOrg string) Endpoints {
 	endpoints := Endpoints{
-		fmt.Sprintf("https://api.tailscale.com/api/v2/tailnet/%s/devices", env.Get("TAILNET_ORG", "undefined")),
+		fmt.Sprintf("https://api.tailscale.com/api/v2/tailnet/%s/devices", tailnetOrg),
 	}
 
 	return endpoints
