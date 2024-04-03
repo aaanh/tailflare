@@ -1,22 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+
 	"net/http"
 )
 
 type Device struct {
-	addresses struct {
-		ipv4 string
-		ipv6 string
-	}
-	name string
-	id   string
+	Addresses []string `json:"addresses"`
+	Name      string   `json:"name"`
+	Id        string   `json:"id"`
 }
 
-type Devices []Device
-
+type Devices struct {
+	Devices []Device `json:"devices"`
+}
 type Endpoints struct {
 	Devices string
 }
@@ -30,6 +30,7 @@ func generateEndpoints(tailnetOrg string) Endpoints {
 }
 
 func getTailscaleDevices(config *Config) {
+	fmt.Printf("\n> Step: Querying Tailscale devices\n\n")
 	client := &http.Client{}
 
 	// var devices Devices
@@ -37,11 +38,26 @@ func getTailscaleDevices(config *Config) {
 
 	req, _ := http.NewRequest("GET", endpoints.Devices, nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", config.Keys.TailscaleApiKey))
-	resp, _ := client.Do(req)
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+
+	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Println("No response")
+		fmt.Println("Unable to perform getTailscaleDevices request")
 	}
-	fmt.Println(string(body))
+	body, _ := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	var data Devices
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Error unmarshalling response: %s", err)
+		fmt.Println()
+	}
+
+	for i := 0; i < len(data.Devices); i++ {
+		fmt.Print("Device ", i, ": ")
+		fmt.Print(data.Devices[i].Addresses[0], " - ")
+		fmt.Print(data.Devices[i].Name)
+		fmt.Println()
+	}
+	fmt.Println()
 }
