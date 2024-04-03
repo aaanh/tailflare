@@ -14,8 +14,9 @@ func TestGetTailscaleHosts(t *testing.T) {
 
 	env.Load("./.env")
 	apiKey := env.Get("TAILSCALE_API_KEY", "undefined")
+	tailnetOrg := env.Get("TAILNET_ORG", "undefined")
 
-	req, _ := http.NewRequest("GET", "https://api.tailscale.com/api/v2/tailnet/aaanh.github/devices", nil)
+	req, _ := http.NewRequest("GET", fmt.Sprintf("https://api.tailscale.com/api/v2/tailnet/%s/devices", tailnetOrg), nil)
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", apiKey))
 	resp, _ := client.Do(req)
 

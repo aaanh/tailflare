@@ -12,19 +12,20 @@ import (
 )
 
 type Keys struct {
-	CloudflareApiKey string
 	TailscaleApiKey  string
+	CloudflareApiKey string
 }
 
 type States struct {
-	CloudflareKeyExist bool
 	TailscaleKeyExist  bool
+	CloudflareKeyExist bool
 }
 
 type Config struct {
-	Version string
-	States  States
-	Keys    Keys
+	Version    string
+	States     States
+	Keys       Keys
+	TailnetOrg string
 }
 
 func displayHeader(version string) {
@@ -100,7 +101,7 @@ func dryRun(config Config) any {
 }
 
 func runSync(config *Config) {
-	panic("unimplemented")
+	getTailscaleDevices(config)
 }
 
 func choiceHandler(choice int, config *Config) {
@@ -150,12 +151,15 @@ func program(config *Config) {
 
 func main() {
 	states := States{false, false}
-	keys := Keys{"", ""}
 
-	env.Load("./config.cfg")
+	env.Load("./config.cfg", "./.env")
 	version := env.Get("version", "0.0.0-undefined")
+	tailscaleApiKey := env.Get("TAILSCALE_API_KEY", "")
+	cloudflareApiKey := env.Get("CLOUDFLARE_API_KEY", "")
 
-	config := Config{version, states, keys}
+	config := Config{version, states, Keys{
+		tailscaleApiKey, cloudflareApiKey,
+	}, env.Get("TAILNET_ORG", "undefined")}
 
 	program(&config)
 
