@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"regexp"
 
 	"net/http"
-	"strings"
 )
 
 type Device struct {
@@ -56,17 +54,9 @@ func getTailscaleDevices(config *Config) {
 	}
 
 	for i := 0; i < len(data.Devices); i++ {
-		// Regular expression to match digits
-		digitRegex := regexp.MustCompile("[0-9]")
-
-		// Replace all digits with "*"
-		maskedIPv4Address := digitRegex.ReplaceAllStringFunc(data.Devices[i].Addresses[0], func(s string) string {
-			return "*"
-		})
-
 		fmt.Print("Device ", i, ": ")
-		fmt.Print(maskedIPv4Address, " - ")
-		fmt.Print(strings.Replace(data.Devices[i].Name, "bobcat-atlas", "*******", -1))
+		fmt.Print(data.Devices[i].Addresses[0], " - ")
+		fmt.Print(data.Devices[i].Name)
 		fmt.Println()
 	}
 	fmt.Println()
