@@ -8,6 +8,11 @@ import (
 
 	"github.com/gofor-little/env"
 	_ "golang.org/x/term"
+
+	structs "github.com/aaanh/tailflare/lib"
+	cf "github.com/aaanh/tailflare/lib/cloudflare"
+	ts "github.com/aaanh/tailflare/lib/tailscale"
+	utils "github.com/aaanh/tailflare/utils"
 )
 
 func displayHeader(version string) {
@@ -16,16 +21,16 @@ func displayHeader(version string) {
 	fmt.Println()
 }
 
-func choiceHandler(choice int, config *Config) {
+func choiceHandler(choice int, config *structs.Config) {
 	switch choice {
 	case 1:
-		configureTailscale(config)
+		ts.ConfigureTailscale(config)
 	case 2:
-		configureTailnetOrg(config)
+		ts.ConfigureTailnetOrg(config)
 	case 3:
-		configureCloudflare(config)
+		cf.ConfigureCloudflare(config)
 	case 4:
-		configureCloudflareZoneId(config)
+		cf.ConfigureCloudflareZoneId(config)
 	case 5:
 		dryRun(*config)
 	case 6:
@@ -42,17 +47,21 @@ func choiceHandler(choice int, config *Config) {
 	}
 }
 
-func program(config *Config) {
+func program(config *structs.Config) {
 	for {
 		updateStates(config)
 		displayHeader(config.Version)
-		choice := menu(*config)
+		choice := utils.Menu(*config)
 		choiceHandler(choice, config)
 	}
 }
 
 func main() {
-	states := States{false, false, false, false}
+	states := structs.States{
+		TailscaleKeyExist:     false,
+		TailnetOrgExist:       false,
+		CloudflareKeyExist:    false,
+		CloudflareZoneIdExist: false}
 
 	var version string
 	var tailscaleApiKey string
@@ -71,9 +80,16 @@ func main() {
 			cloudflareApiKey := ""
 			cloudflareZoneId := ""
 
-			config := Config{version, states,
-				Keys{tailscaleApiKey, cloudflareApiKey},
-				tailnetOrg, cloudflareZoneId}
+			config := structs.Config{
+				Version:          version,
+				States:           states,
+				TailnetOrg:       tailnetOrg,
+				CloudflareZoneId: cloudflareZoneId,
+				Keys: structs.Keys{
+					TailscaleApiKey:  tailscaleApiKey,
+					CloudflareApiKey: cloudflareApiKey,
+				},
+			}
 
 			program(&config)
 		}
@@ -86,9 +102,16 @@ func main() {
 	cloudflareApiKey = env.Get("CLOUDFLARE_API_KEY", "")
 	cloudflareZoneId = env.Get("CLOUDFLARE_ZONE_ID", "")
 
-	config := Config{version, states,
-		Keys{tailscaleApiKey, cloudflareApiKey},
-		tailnetOrg, cloudflareZoneId}
+	config := structs.Config{
+		Version:          version,
+		States:           states,
+		TailnetOrg:       tailnetOrg,
+		CloudflareZoneId: cloudflareZoneId,
+		Keys: structs.Keys{
+			TailscaleApiKey:  tailscaleApiKey,
+			CloudflareApiKey: cloudflareApiKey,
+		},
+	}
 
 	program(&config)
 

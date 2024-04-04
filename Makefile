@@ -1,10 +1,11 @@
 # Go parameters
 GOCMD=go
+GOMAIN=./app
 GOBUILD=$(GOCMD) build
-GORUN=$(GOCMD) run
-GOCLEAN=$(GOCMD) clean
-GOTEST=$(GOCMD) test
-GOGET=$(GOCMD) get
+GORUN=$(GOCMD) run $(GOMAIN)
+GOCLEAN=$(GOCMD) clean $(GOMAIN)
+GOTEST=$(GOCMD) test $(GOMAIN)
+GOGET=$(GOCMD) get $(GOMAIN)
 
 # Name of the executable
 BINARY_NAME=tailflare
@@ -12,14 +13,14 @@ BINARY_NAME=tailflare
 all: cd test build
 
 run:
-	cd src && $(GORUN) .
+	$(GORUN)
 
 build:
-	cd src && $(GOBUILD) -o ../build/$(BINARY_NAME) -v
+	cd app && $(GOBUILD) -o ../../build/$(BINARY_NAME) -v
 
 test:
-	cd src $(GOTEST) -v ./...
+	$(GOTEST) -v ./...
 
 clean: cd
-	cd src && $(GOCLEAN)
+	$(GOCLEAN)
 	rm -f $(BINARY_NAME)

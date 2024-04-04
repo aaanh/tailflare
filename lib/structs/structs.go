@@ -1,8 +1,24 @@
-package main
+package lib
 
 type Keys struct {
 	TailscaleApiKey  string
 	CloudflareApiKey string
+}
+
+type Device struct {
+	Addresses []string `json:"addresses"`
+	Name      string   `json:"name"`
+	Id        string   `json:"id"`
+}
+
+type Devices struct {
+	Devices []Device `json:"devices"`
+}
+type Endpoints struct {
+	TailscaleDevices              string
+	CloudflareKeyCheck            string
+	CloudflareAddRecord           string
+	CloudflareGetDomainFromZoneId string
 }
 
 type States struct {
