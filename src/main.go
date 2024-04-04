@@ -16,28 +16,21 @@ func displayHeader(version string) {
 	fmt.Println()
 }
 
-func dryRun(config Config) any {
-	fmt.Printf("\n\nPerforming dry run and display what-if results.\n\n")
-	return nil
-}
-
-func runSync(config *Config) {
-	getTailscaleDevices(config)
-}
-
 func choiceHandler(choice int, config *Config) {
 	switch choice {
 	case 1:
 		configureTailscale(config)
 	case 2:
-		configureCloudflare(config)
-	case 3:
 		configureTailnetOrg(config)
+	case 3:
+		configureCloudflare(config)
 	case 4:
-		dryRun(*config)
+		configureCloudflareZoneId(config)
 	case 5:
-		runSync(config)
+		dryRun(*config)
 	case 6:
+		performSync(config)
+	case 7:
 		{
 			fmt.Println("\n=== Thanks for using Tailflare :) ===")
 			os.Exit(0)
@@ -59,17 +52,43 @@ func program(config *Config) {
 }
 
 func main() {
-	states := States{false, false, false}
+	states := States{false, false, false, false}
 
+	var version string
+	var tailscaleApiKey string
+	var cloudflareApiKey string
+	var tailnetOrg string
+	var cloudflareZoneId string
+
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("Panic occurred during environment variable load.")
+			fmt.Println(err)
+
+			version := "0.0.0-undefined"
+			tailscaleApiKey := ""
+			tailnetOrg := ""
+			cloudflareApiKey := ""
+			cloudflareZoneId := ""
+
+			config := Config{version, states,
+				Keys{tailscaleApiKey, cloudflareApiKey},
+				tailnetOrg, cloudflareZoneId}
+
+			program(&config)
+		}
+	}()
 	env.Load("./config.cfg", "./.env")
-	version := env.Get("version", "0.0.0-undefined")
-	tailscaleApiKey := env.Get("TAILSCALE_API_KEY", "")
-	cloudflareApiKey := env.Get("CLOUDFLARE_API_KEY", "")
-	tailnetOrg := env.Get("TAILNET_ORG", "")
+
+	version = env.Get("version", "0.0.0-undefined")
+	tailscaleApiKey = env.Get("TAILSCALE_API_KEY", "")
+	tailnetOrg = env.Get("TAILNET_ORG", "")
+	cloudflareApiKey = env.Get("CLOUDFLARE_API_KEY", "")
+	cloudflareZoneId = env.Get("CLOUDFLARE_ZONE_ID", "")
 
 	config := Config{version, states,
 		Keys{tailscaleApiKey, cloudflareApiKey},
-		tailnetOrg}
+		tailnetOrg, cloudflareZoneId}
 
 	program(&config)
 
