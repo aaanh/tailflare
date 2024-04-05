@@ -20,6 +20,7 @@ type Endpoints struct {
 	CloudflareAddRecord            string
 	CloudflareGetDomainFromZoneId  string
 	CloudflareGetRecordsFromZoneId string
+	CloudflareDeleteRecordById     string
 }
 
 type States struct {

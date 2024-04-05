@@ -154,8 +154,7 @@ func GetDnsRecordsFromZoneId(cfg *structs.Config) []structs.CloudflareDnsRecord 
 	client := &http.Client{}
 	endpoints := utils.GenerateEndpoints(cfg)
 
-	req, _ := http.NewRequest("GET", endpoints.CloudflareGetDomainFromZoneId, nil)
-	req.Header.Add("Content-Type", "application/json")
+	req, _ := http.NewRequest("GET", endpoints.CloudflareGetRecordsFromZoneId, nil)
 	req.Header.Add("Authorization", "Bearer "+cfg.Keys.CloudflareApiKey)
 
 	res, err := client.Do(req)
@@ -183,18 +182,53 @@ func DeleteAddedDnsRecords(cfg *structs.Config) {
 		Name string
 		Ipv4 string
 	}
-	for idx, device := range devices.Devices {
+	for _, device := range devices.Devices {
 		var current struct {
 			Name string
 			Ipv4 string
 		}
 		current.Ipv4 = device.Addresses[0]
 		current.Name = device.Name
-		devicesToDelete = append(devicesToDelete)
+		devicesToDelete = append(devicesToDelete, current)
 	}
 
 	records := GetDnsRecordsFromZoneId(cfg)
 
 	var recordsToDelete []string
+
+	for _, r := range records {
+		// Iterate over elements in array B
+		for _, d := range devicesToDelete {
+			fmt.Println(strings.Split(d.Name, ".")[0] + " == " + strings.Split(r.Name, ".")[0] + " - " + r.Content + " == " + d.Ipv4)
+			if strings.Split(r.Name, ".")[0] == strings.Split(d.Name, ".")[0] && r.Content == d.Ipv4 {
+				recordsToDelete = append(recordsToDelete, r.Id)
+				fmt.Println(recordsToDelete)
+			}
+		}
+	}
+
+	client := &http.Client{}
+	endpoints := utils.GenerateEndpoints(cfg)
+
+	for _, r := range recordsToDelete {
+		fmt.Printf(">>> Deleting record with ID %s\n", r)
+
+		req, _ := http.NewRequest("DELETE", endpoints.CloudflareDeleteRecordById+"/"+r, nil)
+
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+cfg.Keys.CloudflareApiKey)
+
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(">>> Error occurred with Cloudflare API request.")
+		}
+
+		defer res.Body.Close()
+		body, _ := io.ReadAll(res.Body)
+
+		fmt.Println(res)
+		fmt.Println(string(body))
+		fmt.Printf("\n\n")
+	}
 
 }

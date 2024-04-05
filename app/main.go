@@ -31,17 +31,19 @@ func choiceHandler(choice int, config *structs.Config) {
 	case 4:
 		cf.ConfigureCloudflareZoneId(config)
 	case 5:
-		dryRun(*config)
-	case 6:
 		performSync(config)
+	case 6:
+		cf.DeleteAddedDnsRecords(config)
 	case 7:
+		dryRun(*config)
+	case 8:
 		{
-			fmt.Println("\n=== Thanks for using Tailflare :) ===")
+			fmt.Println("\n=== Thanks for using Tailflare :> ===")
 			os.Exit(0)
 		}
 	default:
 		{
-			fmt.Printf("\n\n> Invalid choice :(\n\n")
+			fmt.Printf("\n\n> Invalid choice :<\n\n")
 		}
 	}
 }

@@ -38,9 +38,10 @@ func Menu(cfg *structs.Config) int {
 				return "Not added"
 			}
 		}()),
-		5: "Dry run (What-If)",
-		6: "Perform Sync",
-		7: "Exit",
+		5: "Perform Sync",
+		6: "Delete added records",
+		7: "Dry run (What-If)",
+		8: "Exit",
 	}
 
 	// Solve the misordered printing by sorting the keys in the map

@@ -13,6 +13,7 @@ func GenerateEndpoints(cfg *structs.Config) structs.Endpoints {
 		CloudflareAddRecord:            fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/dns_records", cfg.CloudflareZoneId),
 		CloudflareGetDomainFromZoneId:  fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s", cfg.CloudflareZoneId),
 		CloudflareGetRecordsFromZoneId: fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/dns_records", cfg.CloudflareZoneId),
+		CloudflareDeleteRecordById:     fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/dns_records", cfg.CloudflareZoneId),
 	}
 	return endpoints
 }
