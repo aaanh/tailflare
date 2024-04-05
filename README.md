@@ -26,6 +26,14 @@ https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/
 
 ![alt text](docs/tailnet-org-name.png)
 
+### Prep the `.env` file
+
+```
+cp .env.example .env
+```
+
+Add the environment variables gathered in the previous steps.
+
 ### Run directly from source
 
 1. Prerequisites:
