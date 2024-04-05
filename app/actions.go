@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	structs "github.com/aaanh/tailflare/lib"
 	cf "github.com/aaanh/tailflare/lib/cloudflare"
+	structs "github.com/aaanh/tailflare/lib/structs"
 	ts "github.com/aaanh/tailflare/lib/tailscale"
 )
 

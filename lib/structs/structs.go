@@ -15,10 +15,11 @@ type Devices struct {
 	Devices []Device `json:"devices"`
 }
 type Endpoints struct {
-	TailscaleDevices              string
-	CloudflareKeyCheck            string
-	CloudflareAddRecord           string
-	CloudflareGetDomainFromZoneId string
+	TailscaleDevices               string
+	CloudflareKeyCheck             string
+	CloudflareAddRecord            string
+	CloudflareGetDomainFromZoneId  string
+	CloudflareGetRecordsFromZoneId string
 }
 
 type States struct {
@@ -42,4 +43,15 @@ type Payload struct {
 	Proxied bool   `json:"proxied"`
 	Type    string `json:"type"`
 	Ttl     int    `json:"ttl"`
+}
+
+type CloudflareDnsRecord struct {
+	Id      string `json:"id"`
+	Name    string `json:"name"`
+	Content string `json:"content"`
+	Type    string `json:"type"`
+}
+
+type CloudflareDnsRecordsResponse struct {
+	Result []CloudflareDnsRecord `json:"result"`
 }

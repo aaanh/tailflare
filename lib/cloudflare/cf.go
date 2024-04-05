@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	structs "github.com/aaanh/tailflare/lib/structs"
+	"github.com/aaanh/tailflare/lib/tailscale"
 	utils "github.com/aaanh/tailflare/utils"
 )
 
@@ -147,4 +148,53 @@ func GetDomainFromZoneId(config *structs.Config) string {
 	}
 
 	return data.Result.Name
+}
+
+func GetDnsRecordsFromZoneId(cfg *structs.Config) []structs.CloudflareDnsRecord {
+	client := &http.Client{}
+	endpoints := utils.GenerateEndpoints(cfg)
+
+	req, _ := http.NewRequest("GET", endpoints.CloudflareGetDomainFromZoneId, nil)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", "Bearer "+cfg.Keys.CloudflareApiKey)
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(">>> Error occurred with Cloudflare API request.")
+	}
+
+	defer res.Body.Close()
+	body, _ := io.ReadAll(res.Body)
+	var data structs.CloudflareDnsRecordsResponse
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		fmt.Printf("Error unmarshalling response: %s", err)
+		fmt.Println()
+	}
+
+	records := data.Result
+
+	return records
+}
+
+func DeleteAddedDnsRecords(cfg *structs.Config) {
+	devices := tailscale.GetTailscaleDevices(cfg)
+	var devicesToDelete []struct {
+		Name string
+		Ipv4 string
+	}
+	for idx, device := range devices.Devices {
+		var current struct {
+			Name string
+			Ipv4 string
+		}
+		current.Ipv4 = device.Addresses[0]
+		current.Name = device.Name
+		devicesToDelete = append(devicesToDelete)
+	}
+
+	records := GetDnsRecordsFromZoneId(cfg)
+
+	var recordsToDelete []string
+
 }

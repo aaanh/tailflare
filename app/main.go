@@ -9,10 +9,9 @@ import (
 	"github.com/gofor-little/env"
 	_ "golang.org/x/term"
 
-	structs "github.com/aaanh/tailflare/lib"
 	cf "github.com/aaanh/tailflare/lib/cloudflare"
+	structs "github.com/aaanh/tailflare/lib/structs"
 	ts "github.com/aaanh/tailflare/lib/tailscale"
-	utils "github.com/aaanh/tailflare/utils"
 )
 
 func displayHeader(version string) {
@@ -51,7 +50,7 @@ func program(config *structs.Config) {
 	for {
 		updateStates(config)
 		displayHeader(config.Version)
-		choice := utils.Menu(*config)
+		choice := Menu(config)
 		choiceHandler(choice, config)
 	}
 }
