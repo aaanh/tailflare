@@ -12,6 +12,20 @@ It is basically taking the Tailscale IP addresses and put them under a subdomain
 
 ## Usage
 
+### Get API keys
+
+- Cloudflare API key: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/
+  - Create with permission to modify zones
+- Tailscale API key: https://login.tailscale.com/login?next_url=%2Fadmin%%2Fsettings%2Fkeys
+
+### Get Cloudflare zone ID
+
+https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/
+
+### Get Tailnet organization
+
+![alt text](docs/tailnet-org-name.png)
+
 ### Run directly from source
 
 1. Prerequisites:
