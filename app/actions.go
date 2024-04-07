@@ -36,6 +36,7 @@ func updateStates(config *structs.Config) {
 
 func dryRun(config structs.Config) any {
 	fmt.Printf("\n\nPerforming dry run and display what-if results.\n\n")
+	fmt.Printf("\n\nCurrently under development.\n\n")
 	return nil
 }
 
