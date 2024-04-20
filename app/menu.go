@@ -39,8 +39,8 @@ func Menu(cfg *structs.Config) int {
 			}
 		}()),
 		5: "Perform Sync",
-		6: "Delete added records",
-		7: "Dry run (What-If)",
+		6: "Delete synced records",
+		7: "View configurations and keys",
 		8: "Exit",
 	}
 

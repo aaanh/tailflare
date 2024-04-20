@@ -35,7 +35,7 @@ func choiceHandler(choice int, config *structs.Config) {
 	case 6:
 		cf.DeleteAddedDnsRecords(config)
 	case 7:
-		dryRun(*config)
+		viewCurrentConfigs(config)
 	case 8:
 		{
 			fmt.Println("\n=== Thanks for using Tailflare :> ===")

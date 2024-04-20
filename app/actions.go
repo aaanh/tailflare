@@ -34,11 +34,22 @@ func updateStates(config *structs.Config) {
 	}
 }
 
-func dryRun(config structs.Config) any {
-	fmt.Printf("\n\nPerforming dry run and display what-if results.\n\n")
-	fmt.Printf("\n\nCurrently under development.\n\n")
-	return nil
+func viewCurrentConfigs(cfg *structs.Config) {
+	fmt.Printf("\n\n")
+	fmt.Println("=== Configurations and Keys ===")
+	fmt.Println("- Tailscale API key: ", cfg.Keys.TailscaleApiKey)
+	fmt.Println("- Tailnet Organization: ", cfg.TailnetOrg)
+	fmt.Println("- Cloudflare API key: ", cfg.Keys.CloudflareApiKey)
+	fmt.Println("- Cloudflare Zone ID (domain ID): ", cfg.CloudflareZoneId)
+	fmt.Printf("\n\n")
 }
+
+// TODO: To be implemented
+// func dryRun(config structs.Config) any {
+// 	fmt.Printf("\n\nPerforming dry run and display what-if results.\n\n")
+// 	fmt.Printf("\n\nCurrently under development.\n\n")
+// 	return nil
+// }
 
 func performSync(config *structs.Config) {
 	cf.CheckCloudflareToken(config)
