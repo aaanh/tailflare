@@ -34,6 +34,11 @@ func updateStates(config *structs.Config) {
 	}
 }
 
+func exportEnvironmentVariables(config *structs.Config) {
+	// To be implemented
+	return
+}
+
 func viewCurrentConfigs(cfg *structs.Config) {
 	fmt.Printf("\n\n")
 	fmt.Println("=== Configurations and Keys ===")
