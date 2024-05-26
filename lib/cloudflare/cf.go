@@ -70,20 +70,34 @@ func CheckCloudflareToken(config *structs.Config) {
 func ConstructCloudflareDnsPayload(device structs.Device, uri string) structs.Payload {
 	deviceName := strings.Split(device.Name, ".")[0]
 
-	payload := structs.Payload{
-		Content: device.Addresses[0],
-		Name:    deviceName + "." + uri,
-		Proxied: false,
-		Type:    "A",
-		Ttl:     3600,
-	}
+	if len(uri) == 0 {
+		payload := structs.Payload{
+			Content: device.Addresses[0],
+			Name:    deviceName,
+			Proxied: false,
+			Type:    "A",
+			Ttl:     3600,
+		}
 
-	return payload
+		return payload
+	} else {
+		payload := structs.Payload{
+			Content: device.Addresses[0],
+			Name:    deviceName + "." + uri,
+			Proxied: false,
+			Type:    "A",
+			Ttl:     3600,
+		}
+
+		return payload
+	}
 }
 
-func AddCloudflareDnsRecords(config *structs.Config, devices structs.Devices) {
-	fmt.Println("Enter your domain URI (e.g. devices.my-domain.com)")
+func AddCloudflareDnsRecords(config *structs.Config, devices structs.Devices, added *structs.Devices) {
+	fmt.Println("Enter your subdomain URI, if left blank, the added record will be some-device.domain-name.tld")
 	fmt.Printf("> ")
+	var discard string
+	fmt.Scanln(&discard)
 	var uri string
 	fmt.Scanln(&uri)
 
@@ -97,6 +111,7 @@ func AddCloudflareDnsRecords(config *structs.Config, devices structs.Devices) {
 		fmt.Printf(">>> Adding device %d\n", idx)
 		payload := ConstructCloudflareDnsPayload(device, uri)
 		marshalled, err := json.Marshal(payload)
+
 		if err != nil {
 			fmt.Println("Error marshaling JSON:", err)
 			return
@@ -114,9 +129,15 @@ func AddCloudflareDnsRecords(config *structs.Config, devices structs.Devices) {
 
 		defer res.Body.Close()
 		body, _ := io.ReadAll(res.Body)
+		var unmarshalledBody structs.CloudflareAddedRecords
+		_ = json.Unmarshal(body, &unmarshalledBody)
 
-		fmt.Println(res)
-		fmt.Println(string(body))
+		if unmarshalledBody.Success {
+			added.Devices = append(added.Devices, device)
+			added.Devices[len(added.Devices)-1].Id = unmarshalledBody.Result.Id
+		}
+
+		fmt.Printf("%+v\n", unmarshalledBody)
 		fmt.Printf("\n\n")
 	}
 }
@@ -176,7 +197,34 @@ func GetDnsRecordsFromZoneId(cfg *structs.Config) []structs.CloudflareDnsRecord 
 	return records
 }
 
-func DeleteAddedDnsRecords(cfg *structs.Config) {
+func DeleteAddedDnsRecords(cfg *structs.Config, added *structs.Devices) {
+	client := &http.Client{}
+	endpoints := utils.GenerateEndpoints(cfg)
+
+	for _, device := range added.Devices {
+		fmt.Printf(">>> Deleting record %+v\n", device)
+		fmt.Println(device.Id)
+		req, _ := http.NewRequest("DELETE", endpoints.CloudflareDeleteRecordById+"/"+device.Id, nil)
+
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("Authorization", "Bearer "+cfg.Keys.CloudflareApiKey)
+
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(">>> Error occurred with Cloudflare API request.")
+		}
+
+		defer res.Body.Close()
+		body, _ := io.ReadAll(res.Body)
+
+		fmt.Println(res)
+		fmt.Println(string(body))
+		fmt.Printf("\n\n")
+	}
+
+}
+
+func DeleteAllTailscaleRecords(cfg *structs.Config) {
 	devices := tailscale.GetTailscaleDevices(cfg)
 	var devicesToDelete []struct {
 		Name string
@@ -199,10 +247,8 @@ func DeleteAddedDnsRecords(cfg *structs.Config) {
 	for _, r := range records {
 		// Iterate over elements in array B
 		for _, d := range devicesToDelete {
-			fmt.Println(strings.Split(d.Name, ".")[0] + " == " + strings.Split(r.Name, ".")[0] + " - " + r.Content + " == " + d.Ipv4)
 			if strings.Split(r.Name, ".")[0] == strings.Split(d.Name, ".")[0] && r.Content == d.Ipv4 {
 				recordsToDelete = append(recordsToDelete, r.Id)
-				fmt.Println(recordsToDelete)
 			}
 		}
 	}
@@ -230,5 +276,4 @@ func DeleteAddedDnsRecords(cfg *structs.Config) {
 		fmt.Println(string(body))
 		fmt.Printf("\n\n")
 	}
-
 }

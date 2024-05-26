@@ -10,38 +10,39 @@ import (
 
 func Menu(cfg *structs.Config) int {
 	menuOptions := map[int]string{
-		1: fmt.Sprintf("Configure Tailscale API key (%s)", func() string {
+		1: fmt.Sprintf("[#] Configure Tailscale API key (%s)", func() string {
 			if cfg.States.TailscaleKeyExist {
 				return "Added"
 			} else {
 				return "Not added"
 			}
 		}()),
-		2: fmt.Sprintf("Configure Tailnet Organization (%s)", func() string {
+		2: fmt.Sprintf("[#] Configure Tailnet Organization (%s)", func() string {
 			if cfg.States.TailnetOrgExist {
 				return cfg.TailnetOrg
 			} else {
 				return "Not added"
 			}
 		}()),
-		3: fmt.Sprintf("Configure Cloudflare API key (%s)", func() string {
+		3: fmt.Sprintf("[#] Configure Cloudflare API key (%s)", func() string {
 			if cfg.States.CloudflareKeyExist {
 				return "Added"
 			} else {
 				return "Not added"
 			}
 		}()),
-		4: fmt.Sprintf("Configure Cloudflare Zone ID (%s - %s)", cf.GetDomainFromZoneId(cfg), func() string {
+		4: fmt.Sprintf("[#] Configure Cloudflare Zone ID (%s - %s)", cf.GetDomainFromZoneId(cfg), func() string {
 			if cfg.States.CloudflareZoneIdExist {
 				return cfg.CloudflareZoneId
 			} else {
 				return "Not added"
 			}
 		}()),
-		5: "Perform Sync",
-		6: "Delete synced records",
-		7: "View configurations and keys",
-		8: "Exit",
+		5: "[+] Perform Sync",
+		6: "[-] Delete synced records",
+		7: "[-] Delete all Tailscale records from Cloudflare",
+		8: "[i] View configurations and keys",
+		9: "[x] Exit",
 	}
 
 	// Solve the misordered printing by sorting the keys in the map

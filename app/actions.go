@@ -56,7 +56,7 @@ func viewCurrentConfigs(cfg *structs.Config) {
 // 	return nil
 // }
 
-func performSync(config *structs.Config) {
+func performSync(config *structs.Config, added *structs.Devices) {
 	cf.CheckCloudflareToken(config)
-	cf.AddCloudflareDnsRecords(config, ts.GetTailscaleDevices(config))
+	cf.AddCloudflareDnsRecords(config, ts.GetTailscaleDevices(config), added)
 }

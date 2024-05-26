@@ -56,3 +56,8 @@ type CloudflareDnsRecord struct {
 type CloudflareDnsRecordsResponse struct {
 	Result []CloudflareDnsRecord `json:"result"`
 }
+
+type CloudflareAddedRecords struct {
+	Result  CloudflareDnsRecord `json:"result"`
+	Success bool
+}

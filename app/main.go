@@ -20,7 +20,7 @@ func displayHeader(version string) {
 	fmt.Println()
 }
 
-func choiceHandler(choice int, config *structs.Config) {
+func choiceHandler(choice int, config *structs.Config, added *structs.Devices) {
 	switch choice {
 	case 1:
 		ts.ConfigureTailscale(config)
@@ -31,12 +31,14 @@ func choiceHandler(choice int, config *structs.Config) {
 	case 4:
 		cf.ConfigureCloudflareZoneId(config)
 	case 5:
-		performSync(config)
+		performSync(config, added)
 	case 6:
-		cf.DeleteAddedDnsRecords(config)
+		cf.DeleteAddedDnsRecords(config, added)
 	case 7:
-		viewCurrentConfigs(config)
+		cf.DeleteAllTailscaleRecords(config)
 	case 8:
+		viewCurrentConfigs(config)
+	case 9:
 		{
 			fmt.Println("\n=== Thanks for using Tailflare :> ===")
 			os.Exit(0)
@@ -48,12 +50,12 @@ func choiceHandler(choice int, config *structs.Config) {
 	}
 }
 
-func program(config *structs.Config) {
+func program(config *structs.Config, added *structs.Devices) {
 	for {
 		updateStates(config)
 		displayHeader(config.Version)
 		choice := Menu(config)
-		choiceHandler(choice, config)
+		choiceHandler(choice, config, added)
 	}
 }
 
@@ -69,6 +71,8 @@ func main() {
 	var cloudflareApiKey string
 	var tailnetOrg string
 	var cloudflareZoneId string
+
+	var added structs.Devices
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -92,7 +96,7 @@ func main() {
 				},
 			}
 
-			program(&config)
+			program(&config, &added)
 		}
 	}()
 	env.Load("./config.cfg", "./.env")
@@ -114,6 +118,6 @@ func main() {
 		},
 	}
 
-	program(&config)
+	program(&config, &added)
 
 }
